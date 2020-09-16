@@ -1,9 +1,8 @@
 use tera::Tera;
+use tide::{Request, Response};
 use tide_tera::prelude::*;
-use tide::Response;
-use tide::Request;
 
-async fn start_page(req:Request<Tera>) -> Result<Response, tide::Error> {
+async fn start_page(req: Request<Tera>) -> Result<Response, tide::Error> {
     let tera = req.state();
     tera.render_response("index.html", &context! {})
 }
@@ -18,7 +17,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut app = tide::with_state(tera);
 
     app.at("/kpm/").get(start_page);
-    app.at("/kpm/_monitor").get(|_| async { Ok("APPLICATION_STATUS: OK\n") });
+    app.at("/kpm/_monitor")
+        .get(|_| async { Ok("APPLICATION_STATUS: OK\n") });
     app.listen("0.0.0.0:8080").await?;
     Ok(())
 }
