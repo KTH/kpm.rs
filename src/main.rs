@@ -33,7 +33,13 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
     app.at("/kpm/index.js").get(index_js);
     app.at(&format!("/kpm/index-{}.css", css::hash())).get(index_css);
     app.at("/kpm/_monitor")
-        .get(|_| async { Ok("APPLICATION_STATUS: OK\n") });
+        .get(|_| async { Ok(concat!(
+            "APPLICATION_STATUS: OK ",
+            env!("CARGO_PKG_NAME"),
+            "-"
+            env!("dockerVersion", "unknown"),
+            "\n"
+        )) });
     app.listen("0.0.0.0:8080").await?;
     Ok(())
 }

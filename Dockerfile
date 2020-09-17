@@ -10,7 +10,11 @@ RUN mkdir -p src; \
 
 # Then build the app
 COPY src src
-RUN cargo install --path .
+COPY version.conf version.conf
+RUN \
+    sed -e 's/^/export /' -e 's/=/="/' -e 's/$/"/' buildinfo.conf > buildinfo.sh && \
+    . ./buildinfo.sh && \
+    cargo install --path .
 
 # Then start a new slim image (without dev tools) and copy in the binary
 FROM debian:buster-slim
