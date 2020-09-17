@@ -1,6 +1,18 @@
 (function(d){
-  var pm = d.createElement('nav')
-  pm.innerHTML= '<div style="background:red">hejsan</div>'
-  d.body.insertBefore(pm,d.body.firstChild)
+  function create_menu() {
+    var el = d.createElement('nav');
+    el.id = "kpm"
+    el.innerHTML= '<div class="container">hejsan</div>';
+    d.body.insertBefore(el, d.body.firstChild);
+  }
+  function fetch_css() {
+    var el = d.createElement('link');
+    el.href = '/kpm/index.css';
+    el.rel = "stylesheet";
+    el.type = "text/css";
+    d.head.appendChild(el);
+  }
+  fetch_css();
+  create_menu();
 })(document)
 
