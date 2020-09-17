@@ -2,16 +2,17 @@ use md5;
 
 pub static CSS: &str = "
 html, body {
-    scroll-padding-top: $toolbarheight;
+    scroll-padding-top: calc(2rem + 3px);
 }
 body{
-    margin-top: 2rem;
+    margin-top: calc(2rem + 1px);
 }
 nav#kpm {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
+    z-index: 9999;
 }
 nav#kpm>.kpmbar{
     line-height: 2rem;
@@ -20,6 +21,7 @@ nav#kpm>.kpmbar{
     height: 2rem;
     background: peru;
     color: white;
+    border-bottom: solid 1px #fff;
 }\n";
 
 pub fn hash() -> String {
