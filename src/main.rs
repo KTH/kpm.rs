@@ -5,6 +5,7 @@ use tide::http::mime;
 use tide::http::headers::EXPIRES;
 use httpdate::fmt_http_date;
 use std::time::{Duration, SystemTime};
+use std::env;
 mod css;
 use async_std::process::exit;
 
@@ -44,7 +45,11 @@ async fn start_page(req: Request<Tera>) -> Result<Response, tide::Error> {
 
 async fn index_js(req: Request<Tera>) -> Result<Response, tide::Error> {
     let tera = req.state();
-    tera.render_response("index.js", &context! { "js_hash" => css::hash() })
+    let host_url = env::var("SERVER_HOST_URL")
+        .unwrap_or_else(|_| "http://localdev.kth.se:8080".into());
+    tera.render_response("index.js", &context! {
+        "css_url" => format!("{}/kpm/index-{}.css", host_url, css::hash()),
+    })
 }
 
 async fn index_css(_: Request<Tera>) -> Result<Response, tide::Error> {
