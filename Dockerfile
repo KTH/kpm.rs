@@ -10,7 +10,7 @@ RUN mkdir -p src; \
 
 # Then build the app
 COPY src src
-COPY version.conf version.conf
+COPY buildinfo.conf buildinfo.conf
 RUN \
     sed -e 's/^/export /' -e 's/=/="/' -e 's/$/"/' buildinfo.conf > buildinfo.sh && \
     . ./buildinfo.sh && \
