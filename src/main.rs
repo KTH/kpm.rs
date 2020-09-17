@@ -32,14 +32,7 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
     app.at("/kpm/").get(start_page);
     app.at("/kpm/index.js").get(index_js);
     app.at(&format!("/kpm/index-{}.css", css::hash())).get(index_css);
-    app.at("/kpm/_monitor")
-        .get(|_| async { Ok(concat!(
-            "APPLICATION_STATUS: OK ",
-            env!("CARGO_PKG_NAME"),
-            "-"
-            env!("dockerVersion", "unknown"),
-            "\n"
-        )) });
+    app.at("/kpm/_monitor").get(monitor);
     app.listen("0.0.0.0:8080").await?;
     Ok(())
 }
@@ -47,6 +40,15 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
 async fn start_page(req: Request<Tera>) -> Result<Response, tide::Error> {
     let tera = req.state();
     tera.render_response("index.html", &context! {})
+}
+
+async fn monitor(_req: Request<Tera>) -> Result<Response, tide::Error> {
+    Ok(format!(
+        "APPLICATION_STATUS: {} {}-{}\n",
+        "OK",
+        env!("CARGO_PKG_NAME"),
+        option_env!("dockerVersion").unwrap_or("unknown"),
+    ).into())
 }
 
 async fn index_js(req: Request<Tera>) -> Result<Response, tide::Error> {
