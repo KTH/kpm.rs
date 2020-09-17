@@ -6,8 +6,9 @@
     d.body.insertBefore(el, d.body.firstChild);
   }
   function fetch_css() {
+    var base = (d.currentScript || d.querySelector('script[src*=kpm]')).src;
     var el = d.createElement('link');
-    el.href = '/kpm/index-{{ js_hash }}.css';
+    el.href = base.substr(0, 1+base.lastIndexOf('/'))+'index-{{ js_hash }}.css';
     el.rel = "stylesheet";
     el.type = "text/css";
     d.head.appendChild(el);
