@@ -11,3 +11,5 @@ tide = "0.11.0"
 async-std = { version = "1.6.0", features = ["attributes"] }
 tera = "1.5.0"
 tide-tera = "0.1.1"
+md5 = "0.7.0"
+httpdate = "0.3.1"

@@ -7,7 +7,7 @@
   }
   function fetch_css() {
     var el = d.createElement('link');
-    el.href = '/kpm/index.css';
+    el.href = '/kpm/index-{{ js_hash }}.css';
     el.rel = "stylesheet";
     el.type = "text/css";
     d.head.appendChild(el);
