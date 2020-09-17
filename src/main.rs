@@ -45,10 +45,16 @@ async fn start_page(req: Request<Tera>) -> Result<Response, tide::Error> {
 
 async fn index_js(req: Request<Tera>) -> Result<Response, tide::Error> {
     let tera = req.state();
-    let host_url = env::var("SERVER_HOST_URL")
-        .unwrap_or_else(|_| "http://localdev.kth.se:8080".into());
+    let host_url = env_or("SERVER_HOST_URL", "http://localdev.kth.se:8080");
     tera.render_response("index.js", &context! {
         "css_url" => format!("{}/kpm/index-{}.css", host_url, css::hash()),
+    })
+}
+
+fn env_or(var: &str, default: &str) -> String {
+    env::var(var).unwrap_or_else(|err| {
+        tide::log::error!("Error getting {:?}: {}, using {:?}", var, err, default);
+        default.into()
     })
 }
 
