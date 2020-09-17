@@ -6,11 +6,23 @@ use tide::http::headers::EXPIRES;
 use httpdate::fmt_http_date;
 use std::time::{Duration, SystemTime};
 mod css;
+use async_std::process::exit;
 
 #[async_std::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() {
     tide::log::start();
+    match run().await {
+        Ok(()) => tide::log::info!("Shutting down"),
+        Err(e) => {
+            tide::log::error!("Shutting down on error", {
+                error: e.to_string(),
+            });
+            exit(1);
+        }
+    }
+}
 
+async fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut tera = Tera::new("templates/**/*")?;
     tera.autoescape_on(vec!["html"]);
 
