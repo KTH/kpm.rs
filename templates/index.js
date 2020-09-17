@@ -2,7 +2,7 @@
   function create_menu() {
     var el = d.createElement('nav');
     el.id = "kpm"
-    el.innerHTML= '<div class="container">hejsan</div>';
+    el.innerHTML= '<div class="kpmbar">hejsan</div>';
     d.body.insertBefore(el, d.body.firstChild);
   }
   function fetch_css() {

@@ -13,9 +13,10 @@ nav#kpm {
     left: 0;
     right: 0;
 }
-nav#kpm>.container{
+nav#kpm>.kpmbar{
     line-height: 2rem;
     margin: 0;
+    padding: 0 1rem;
     height: 2rem;
     background: peru;
     color: white;
