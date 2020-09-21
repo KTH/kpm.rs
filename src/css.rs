@@ -33,7 +33,7 @@ nav#kpm>.kpmbar{
 nav#kpm>.kpmpanel{
     border: solid 1px peru;
     border-width: 0 1px 1ex 1px;
-    margin: -1px max(calc(50vw - 620px - 1em), 0) 0;
+    margin: -1px max(calc(50vw - 620px - 1em), 0px) 0;
     max-width: 50em;
     background: white;
     padding: 1em;
