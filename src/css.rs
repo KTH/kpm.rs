@@ -6,6 +6,9 @@ html, body {
 }
 body{
     margin-top: calc(2rem + 1px);
+    position: relative !important;
+    border-top: none !important;
+    padding-top: 0;
 }
 nav#kpm {
     position: fixed;
@@ -16,7 +19,7 @@ nav#kpm {
 }
 nav#kpm.open {
     height: 100vh;
-    background: rgba(0,0,0,0.3);o
+    background: rgba(0,0,0,0.3);
 }
 nav#kpm>.kpmbar{
     line-height: 2rem;
