@@ -41,6 +41,28 @@ nav#kpm>.kpmpanel{
 }
 nav#kpm.open>.kpmpanel{
     display: block;
+}
+// And some special page-level adaptions for canvas
+// Some rules specially for canvas
+div.ef-file-preview-overlay {
+    /*to keep the Canvas preview below the personal menu*/
+    margin-top: calc(2rem + 1px);
+}
+div.ReactTrayPortal div.ReactTray__Overlay,
+#flash_message_holder {
+  top: calc(2rem + 1px) !important;
+}
+header.ic-app-header {
+    height: calc(100% - #{calc(2rem + 3px)});
+    top: calc(2rem + 1px);
+}
+body.use-personal-menu div.ui-widget.ui-tooltip {
+    z-index: 10030;
+}
+
+body.use-personal-menu #nav-tray-portal > span > span,
+div#main.ic-Layout-columns > span > span, #discussion-toolbar > div {
+    top: calc(2rem + 1px);
 }\n";
 
 pub fn hash() -> String {
