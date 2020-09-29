@@ -1,5 +1,3 @@
-use md5;
-
 pub static CSS: &str = "
 html, body {
     scroll-padding-top: calc(2rem + 3px);
