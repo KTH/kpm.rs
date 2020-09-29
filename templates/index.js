@@ -1,9 +1,13 @@
 (function(d){
+  var kpm;
   function create_menu() {
-    var el = d.createElement('nav');
-    el.id = "kpm"
-    el.innerHTML= '<div class="kpmbar">hejsan</div>';
-    d.body.insertBefore(el, d.body.firstChild);
+    kpm = d.createElement('nav');
+    kpm.id = "kpm"
+    kpm.innerHTML= '<div class="kpmbar"><a href="#kpm" data-open="hello">Hejsan</a></div><div class="kpmpanel"></div>';
+    [].forEach.call(kpm.querySelectorAll('a[href="#kpm"]'), function(a) {
+      a.addEventListener('click', open_panel);
+    });
+    d.body.insertBefore(kpm, d.body.firstChild);
   }
   function fetch_css() {
     var el = d.createElement('link');
@@ -11,6 +15,14 @@
     el.rel = "stylesheet";
     el.type = "text/css";
     d.head.appendChild(el);
+  }
+  function open_panel(e) {
+    console.log("Open panel for", e.target)
+    kpm.classList.toggle('open')
+    // TODO: Load this from the server
+    kpm.querySelector('.kpmpanel').innerHTML = '<p>Hello world</p>'
+    e.preventDefault();
+    e.stopPropagation();
   }
   fetch_css();
   create_menu();
