@@ -10,7 +10,6 @@ edition = "2018"
 tide = "0.13.0"
 async-std = { version = "1.6.0", features = ["attributes"] }
 tera = "1.5.0"
-# TODO Use release when possible: https://github.com/jbr/tide-tera/issues/3
-tide-tera = { git = "https://github.com/jbr/tide-tera", branch = "main" }
+tide-tera = "0.2.0"
 md5 = "0.7.0"
 httpdate = "0.3.1"
