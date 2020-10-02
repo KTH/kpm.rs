@@ -12,7 +12,7 @@ pub struct Footer {
 }
 
 /// Where to fetch the KTH page footer
-const FOOTER_URL: &str = "https://www.kth.se/cm/x1.202278";
+const FOOTER_URL: &str = "https://www.kth.se/cm/1.202278";
 
 /// How long to keep the footer.
 ///
