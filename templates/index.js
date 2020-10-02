@@ -3,7 +3,7 @@
   function create_menu() {
     kpm = d.createElement('nav');
     kpm.id = "kpm"
-    kpm.innerHTML= '<div class="kpmbar"><a href="#kpm" data-open="hello">Hejsan</a></div><div class="kpmpanel"></div>';
+    kpm.innerHTML= '<div class="kpmbar"><a href="#kpm" data-open="hello">Menu</a></div><div class="kpmpanel"></div>';
     [].forEach.call(kpm.querySelectorAll('a[href="#kpm"]'), function(a) {
       a.addEventListener('click', open_panel);
     });
