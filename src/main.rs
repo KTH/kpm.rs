@@ -32,7 +32,7 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
     app.at("/kpm/").get(start_page);
     app.at("/kpm/index.js").get(index_js);
     app.at(&format!("/kpm/{}", css::page_css_name())).get(page_css);
-    app.at(&format!("/kpm/index-{}.css", css::hash())).get(index_css);
+    app.at(&format!("/kpm/{}", css::menu_css_name())).get(menu_css);
     app.at("/kpm/_monitor").get(monitor);
     app.listen("0.0.0.0:8080").await?;
     Ok(())
@@ -58,7 +58,7 @@ async fn index_js(req: Request<Tera>) -> Result<Response, tide::Error> {
     let tera = req.state();
     let host_url = env_or("SERVER_HOST_URL", "http://localdev.kth.se:8080");
     tera.render_response("index.js", &context! {
-        "css_url" => format!("{}/kpm/index-{}.css", host_url, css::hash()),
+        "css_url" => format!("{}/kpm/{}", host_url, css::menu_css_name()),
     })
 }
 
@@ -72,7 +72,7 @@ fn env_or(var: &str, default: &str) -> String {
 async fn page_css(_: Request<Tera>) -> Result<Response, tide::Error> {
     Ok(css_result(css::PAGE_CSS))
 }
-async fn index_css(_: Request<Tera>) -> Result<Response, tide::Error> {
+async fn menu_css(_: Request<Tera>) -> Result<Response, tide::Error> {
     Ok(css_result(css::MENU_CSS))
 }
 fn css_result(style: &str) -> Response {
