@@ -6,8 +6,12 @@ use tide::http::headers::EXPIRES;
 use httpdate::fmt_http_date;
 use std::time::{Duration, SystemTime};
 use std::env;
-mod css;
 use async_std::process::exit;
+
+mod css;
+mod footer;
+
+type Error = Box<dyn std::error::Error + Send + Sync>;
 
 #[async_std::main]
 async fn main() {
@@ -23,11 +27,8 @@ async fn main() {
     }
 }
 
-async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    let mut tera = Tera::new("templates/**/*")?;
-    tera.autoescape_on(vec!["html"]);
-
-    let mut app = tide::with_state(tera);
+async fn run() -> Result<(), Error> {
+    let mut app = tide::with_state(State::new()?);
 
     app.at("/kpm/").get(start_page);
     app.at("/kpm/index.js").get(index_js);
@@ -38,14 +39,34 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-async fn start_page(req: Request<Tera>) -> Result<Response, tide::Error> {
-    let tera = req.state();
-    tera.render_response("index.html", &context! {
-        "page_css" => css::page_css_name(),
-    })
+/// The application state for kpm
+#[derive(Clone)]
+struct State {
+    tera: Tera,
+    footer: footer::Footer,
 }
 
-async fn monitor(_req: Request<Tera>) -> Result<Response, tide::Error> {
+impl State {
+    fn new() -> Result<State, Error> {
+        let mut tera = Tera::new("templates/**/*")?;
+        tera.autoescape_on(vec!["html"]);
+        let footer = footer::Footer::new();
+        Ok(State { tera, footer })
+    }
+}
+
+async fn start_page(req: Request<State>) -> Result<Response, tide::Error> {
+    let kpm = req.state();
+    kpm.tera.render_response(
+        "index.html",
+        &context! {
+            "page_css" => css::page_css_name(),
+            "kth_footer" => *kpm.footer.get().await,
+        },
+    )
+}
+
+async fn monitor(_req: Request<State>) -> Result<Response, tide::Error> {
     Ok(format!(
         "APPLICATION_STATUS: {} {}-{}\n",
         "OK",
@@ -54,10 +75,10 @@ async fn monitor(_req: Request<Tera>) -> Result<Response, tide::Error> {
     ).into())
 }
 
-async fn index_js(req: Request<Tera>) -> Result<Response, tide::Error> {
-    let tera = req.state();
+async fn index_js(req: Request<State>) -> Result<Response, tide::Error> {
+    let kpm = req.state();
     let host_url = env_or("SERVER_HOST_URL", "http://localdev.kth.se:8080");
-    tera.render_response("index.js", &context! {
+    kpm.tera.render_response("index.js", &context! {
         "css_url" => format!("{}/kpm/{}", host_url, css::menu_css_name()),
     })
 }
@@ -69,10 +90,10 @@ fn env_or(var: &str, default: &str) -> String {
     })
 }
 
-async fn page_css(_: Request<Tera>) -> Result<Response, tide::Error> {
+async fn page_css(_: Request<State>) -> Result<Response, tide::Error> {
     Ok(css_result(css::PAGE_CSS))
 }
-async fn menu_css(_: Request<Tera>) -> Result<Response, tide::Error> {
+async fn menu_css(_: Request<State>) -> Result<Response, tide::Error> {
     Ok(css_result(css::MENU_CSS))
 }
 fn css_result(style: &str) -> Response {
