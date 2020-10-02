@@ -6,6 +6,15 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tide::log;
 
+/// The content for the KTH footer.
+///
+/// The footer is automatically fetched from the cortina block api and
+/// kept up to date.
+/// The `Footer` struct derives `Clone` so that it can be included in
+/// the application state, which tide clones for each request.
+/// This only clones the reference counted pointer.  All the clones
+/// points to the same lock, containing the same string, which is kept
+/// up-to-date.
 #[derive(Clone)]
 pub struct Footer {
     content: Arc<RwLock<String>>,

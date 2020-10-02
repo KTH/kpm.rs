@@ -13,6 +13,9 @@ mod footer;
 
 type Error = Box<dyn std::error::Error + Send + Sync>;
 
+/// The main entry point.
+///
+/// This just initalizies the loggr, calls run and logs when it returns.
 #[async_std::main]
 async fn main() {
     tide::log::start();
@@ -27,6 +30,10 @@ async fn main() {
     }
 }
 
+/// The app entry point
+///
+/// This creates the state and the app, adds the route handlers and
+/// runs the app.
 async fn run() -> Result<(), Error> {
     let mut app = tide::with_state(State::new()?);
 
