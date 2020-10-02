@@ -9,8 +9,8 @@ pub fn page_css_name() -> String {
 }
 
 fn hash(data: &str) -> String {
-  let digest = md5::compute(data);
-  let mut digest = format!("{:x}", digest);
-  digest.truncate(8);
-  digest
+    let digest = md5::compute(data);
+    let mut digest = format!("{:x}", digest);
+    digest.truncate(8);
+    digest
 }

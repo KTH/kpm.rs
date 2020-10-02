@@ -1,12 +1,12 @@
+use async_std::process::exit;
+use httpdate::fmt_http_date;
+use std::env;
+use std::time::{Duration, SystemTime};
 use tera::Tera;
+use tide::http::headers::EXPIRES;
+use tide::http::mime;
 use tide::{Request, Response};
 use tide_tera::prelude::*;
-use tide::http::mime;
-use tide::http::headers::EXPIRES;
-use httpdate::fmt_http_date;
-use std::time::{Duration, SystemTime};
-use std::env;
-use async_std::process::exit;
 
 mod css;
 mod footer;
@@ -32,8 +32,10 @@ async fn run() -> Result<(), Error> {
 
     app.at("/kpm/").get(start_page);
     app.at("/kpm/index.js").get(index_js);
-    app.at(&format!("/kpm/{}", css::page_css_name())).get(page_css);
-    app.at(&format!("/kpm/{}", css::menu_css_name())).get(menu_css);
+    app.at(&format!("/kpm/{}", css::page_css_name()))
+        .get(page_css);
+    app.at(&format!("/kpm/{}", css::menu_css_name()))
+        .get(menu_css);
     app.at("/kpm/_monitor").get(monitor);
     app.listen("0.0.0.0:8080").await?;
     Ok(())
@@ -72,15 +74,19 @@ async fn monitor(_req: Request<State>) -> Result<Response, tide::Error> {
         "OK",
         env!("CARGO_PKG_NAME"),
         option_env!("dockerVersion").unwrap_or("unknown"),
-    ).into())
+    )
+    .into())
 }
 
 async fn index_js(req: Request<State>) -> Result<Response, tide::Error> {
     let kpm = req.state();
     let host_url = env_or("SERVER_HOST_URL", "http://localdev.kth.se:8080");
-    kpm.tera.render_response("index.js", &context! {
-        "css_url" => format!("{}/kpm/{}", host_url, css::menu_css_name()),
-    })
+    kpm.tera.render_response(
+        "index.js",
+        &context! {
+            "css_url" => format!("{}/kpm/{}", host_url, css::menu_css_name()),
+        },
+    )
 }
 
 fn env_or(var: &str, default: &str) -> String {

@@ -1,9 +1,9 @@
 use crate::Error;
-use async_std::task;
 use async_std::sync::{RwLock, RwLockReadGuard};
+use async_std::task;
+use std::mem::swap;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
-use std::mem::swap;
 use tide::log;
 
 #[derive(Clone)]
@@ -20,7 +20,6 @@ const FOOTER_URL: &str = "https://www.kth.se/cm/x1.202278";
 /// After this duration, the footer is fetched.  If fetch fails, old
 /// data is kept.
 const A_WHILE: Duration = Duration::from_secs(63 * 63);
-
 
 impl Footer {
     pub fn new() -> Self {
