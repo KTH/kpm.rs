@@ -27,7 +27,7 @@ impl Footer {
         task::spawn(reload(content.clone()));
         Footer { content }
     }
-    pub async fn get<'a>(&'a self) -> RwLockReadGuard<'a, String> {
+    pub async fn get(&self) -> RwLockReadGuard<'_, String> {
         self.content.read().await
     }
 }
