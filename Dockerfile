@@ -15,6 +15,7 @@ COPY buildinfo.conf buildinfo.conf
 RUN \
     sed -e 's/^/export /' -e 's/=/="/' -e 's/$/"/' buildinfo.conf > buildinfo.sh && \
     . ./buildinfo.sh && \
+    touch src/main.rs && \
     cargo install --path .
 
 # Then start a new slim image (without dev tools) and copy in the binary
