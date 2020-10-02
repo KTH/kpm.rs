@@ -1,4 +1,4 @@
-pub static CSS: &str = "
+pub static MENU_CSS: &str = "
 html, body {
     scroll-padding-top: calc(2rem + 3px);
 }
@@ -63,9 +63,18 @@ div#main.ic-Layout-columns > span > span, #discussion-toolbar > div {
     top: calc(2rem + 1px);
 }\n";
 
+pub static PAGE_CSS: &str = include_str!("../style/kth-bootstrap.css");
+
 pub fn hash() -> String {
-  let digest = md5::compute(CSS);
+  let digest = md5::compute(MENU_CSS);
   let mut digest = format!("{:x}", digest);
   digest.truncate(8);
   digest
+}
+
+pub fn page_css_name() -> String {
+    let digest = md5::compute(MENU_CSS);
+    let mut digest = format!("{:x}", digest);
+    digest.truncate(8);
+    format!("page-{}.css", digest)
 }

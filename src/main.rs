@@ -31,6 +31,7 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
 
     app.at("/kpm/").get(start_page);
     app.at("/kpm/index.js").get(index_js);
+    app.at(&format!("/kpm/{}", css::page_css_name())).get(page_css);
     app.at(&format!("/kpm/index-{}.css", css::hash())).get(index_css);
     app.at("/kpm/_monitor").get(monitor);
     app.listen("0.0.0.0:8080").await?;
@@ -39,7 +40,9 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
 
 async fn start_page(req: Request<Tera>) -> Result<Response, tide::Error> {
     let tera = req.state();
-    tera.render_response("index.html", &context! {})
+    tera.render_response("index.html", &context! {
+        "page_css" => css::page_css_name(),
+    })
 }
 
 async fn monitor(_req: Request<Tera>) -> Result<Response, tide::Error> {
@@ -66,11 +69,17 @@ fn env_or(var: &str, default: &str) -> String {
     })
 }
 
+async fn page_css(_: Request<Tera>) -> Result<Response, tide::Error> {
+    Ok(css_result(css::PAGE_CSS))
+}
 async fn index_css(_: Request<Tera>) -> Result<Response, tide::Error> {
-    let mut res: Response = css::CSS.into();
+    Ok(css_result(css::MENU_CSS))
+}
+fn css_result(style: &str) -> Response {
+    let mut res: Response = style.into();
     res.set_content_type(mime::CSS);
     res.insert_header(EXPIRES, fmt_http_date(SystemTime::now() + 180 * DAY));
-    Ok(res)
+    res
 }
 
 const DAY: Duration = Duration::from_secs(24 * 60 * 60);
