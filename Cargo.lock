@@ -946,6 +946,7 @@ dependencies = [
  "async-std",
  "httpdate",
  "md5",
+ "serde",
  "surf",
  "tera",
  "tide",
