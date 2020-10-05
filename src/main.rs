@@ -72,7 +72,7 @@ impl State {
 
 async fn start_page(req: Request<State>) -> Result<Response, tide::Error> {
     let kpm = req.state();
-    let is_active = dbg!(req.cookie("use_kpm")).is_some();
+    let is_active = req.cookie("use_kpm").is_some();
     kpm.tera.render_response(
         "index.html",
         &context! {
@@ -86,7 +86,7 @@ async fn start_page(req: Request<State>) -> Result<Response, tide::Error> {
 async fn enable_or_disable(mut req: Request<State>) -> Result<Response, tide::Error> {
     let post: StatusForm = req.body_form().await?;
     let kpm = req.state();
-    let activate = dbg!(post).action == "enable";
+    let activate = post.action == "enable";
     if activate {
         tide::log::info!("A user activated KPM");
     } else {
