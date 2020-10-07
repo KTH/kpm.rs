@@ -1,14 +1,21 @@
+use async_std::process::exit;
+use httpdate::fmt_http_date;
+use std::env;
+use std::time::{Duration, SystemTime};
 use tera::Tera;
+use tide::http::headers::EXPIRES;
+use tide::http::mime;
 use tide::{Request, Response};
 use tide_tera::prelude::*;
-use tide::http::mime;
-use tide::http::headers::EXPIRES;
-use httpdate::fmt_http_date;
-use std::time::{Duration, SystemTime};
-use std::env;
-mod css;
-use async_std::process::exit;
 
+mod css;
+mod footer;
+
+type Error = Box<dyn std::error::Error + Send + Sync>;
+
+/// The main entry point.
+///
+/// This just initalizies the loggr, calls run and logs when it returns.
 #[async_std::main]
 async fn main() {
     tide::log::start();
@@ -23,40 +30,70 @@ async fn main() {
     }
 }
 
-async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    let mut tera = Tera::new("templates/**/*")?;
-    tera.autoescape_on(vec!["html"]);
-
-    let mut app = tide::with_state(tera);
+/// The app entry point
+///
+/// This creates the state and the app, adds the route handlers and
+/// runs the app.
+async fn run() -> Result<(), Error> {
+    let mut app = tide::with_state(State::new()?);
 
     app.at("/kpm/").get(start_page);
     app.at("/kpm/index.js").get(index_js);
-    app.at(&format!("/kpm/index-{}.css", css::hash())).get(index_css);
+    app.at(&format!("/kpm/{}", css::page_css_name()))
+        .get(page_css);
+    app.at(&format!("/kpm/{}", css::menu_css_name()))
+        .get(menu_css);
     app.at("/kpm/_monitor").get(monitor);
     app.listen("0.0.0.0:8080").await?;
     Ok(())
 }
 
-async fn start_page(req: Request<Tera>) -> Result<Response, tide::Error> {
-    let tera = req.state();
-    tera.render_response("index.html", &context! {})
+/// The application state for kpm
+#[derive(Clone)]
+struct State {
+    tera: Tera,
+    footer: footer::Footer,
 }
 
-async fn monitor(_req: Request<Tera>) -> Result<Response, tide::Error> {
+impl State {
+    fn new() -> Result<State, Error> {
+        let mut tera = Tera::new("templates/**/*")?;
+        tera.autoescape_on(vec!["html"]);
+        let footer = footer::Footer::new();
+        Ok(State { tera, footer })
+    }
+}
+
+async fn start_page(req: Request<State>) -> Result<Response, tide::Error> {
+    let kpm = req.state();
+    kpm.tera.render_response(
+        "index.html",
+        &context! {
+            "page_css" => css::page_css_name(),
+            "kth_footer" => *kpm.footer.get().await,
+        },
+    )
+}
+
+async fn monitor(_req: Request<State>) -> Result<Response, tide::Error> {
     Ok(format!(
         "APPLICATION_STATUS: {} {}-{}\n",
         "OK",
         env!("CARGO_PKG_NAME"),
         option_env!("dockerVersion").unwrap_or("unknown"),
-    ).into())
+    )
+    .into())
 }
 
-async fn index_js(req: Request<Tera>) -> Result<Response, tide::Error> {
-    let tera = req.state();
+async fn index_js(req: Request<State>) -> Result<Response, tide::Error> {
+    let kpm = req.state();
     let host_url = env_or("SERVER_HOST_URL", "http://localdev.kth.se:8080");
-    tera.render_response("index.js", &context! {
-        "css_url" => format!("{}/kpm/index-{}.css", host_url, css::hash()),
-    })
+    kpm.tera.render_response(
+        "index.js",
+        &context! {
+            "css_url" => format!("{}/kpm/{}", host_url, css::menu_css_name()),
+        },
+    )
 }
 
 fn env_or(var: &str, default: &str) -> String {
@@ -66,11 +103,17 @@ fn env_or(var: &str, default: &str) -> String {
     })
 }
 
-async fn index_css(_: Request<Tera>) -> Result<Response, tide::Error> {
-    let mut res: Response = css::CSS.into();
+async fn page_css(_: Request<State>) -> Result<Response, tide::Error> {
+    Ok(css_result(css::PAGE_CSS))
+}
+async fn menu_css(_: Request<State>) -> Result<Response, tide::Error> {
+    Ok(css_result(css::MENU_CSS))
+}
+fn css_result(style: &str) -> Response {
+    let mut res: Response = style.into();
     res.set_content_type(mime::CSS);
     res.insert_header(EXPIRES, fmt_http_date(SystemTime::now() + 180 * DAY));
-    Ok(res)
+    res
 }
 
 const DAY: Duration = Duration::from_secs(24 * 60 * 60);
