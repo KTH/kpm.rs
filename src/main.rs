@@ -58,12 +58,20 @@ struct State {
 }
 
 impl State {
+    /// Initialize the global state.
+    ///
+    /// This should only be done once, on application startup.
     fn new() -> Result<State, Error> {
         let mut tera = Tera::new("templates/**/*")?;
         tera.autoescape_on(vec!["html"]);
         let footer = footer::Footer::new();
         Ok(State { tera, footer })
     }
+    /// Get the base url of this app.
+    ///
+    /// In production, this should return "https://app.kth.se/kpm/".
+    /// The result depends on the `$SERVER_HOST_URL` environment, and
+    /// adds "/kpm/" to that.
     fn base_url(&self) -> String {
         let host_url = env_or("SERVER_HOST_URL", "http://localdev.kth.se:8080");
         format!("{}/kpm/", host_url)
@@ -83,6 +91,13 @@ async fn start_page(req: Request<State>) -> Result<Response, tide::Error> {
     )
 }
 
+/// The action for a POST of the enable/disable form.
+///
+/// Parses / validates the form data.
+/// If the request is to enable kpm, a `use_kpm` cookie is set in the
+/// response.
+/// Otherwise (to disable kpm), the `use_kpm` cookie is cleared.
+/// In either case, the action is logged.
 async fn enable_or_disable(mut req: Request<State>) -> Result<Response, tide::Error> {
     let post: StatusForm = req.body_form().await?;
     let kpm = req.state();
@@ -105,6 +120,9 @@ async fn enable_or_disable(mut req: Request<State>) -> Result<Response, tide::Er
         .build())
 }
 
+/// The form data required when posting to `enable_or_disable`.
+///
+/// Currently only contains an `action` string.
 #[derive(Debug, Deserialize)]
 struct StatusForm {
     action: String,
