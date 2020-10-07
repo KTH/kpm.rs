@@ -12,6 +12,8 @@ RUN mkdir -p src; \
 COPY src src
 COPY style style
 COPY buildinfo.conf buildinfo.conf
+# The touch command in this script is to make sure the app itself is
+# actually rebuilt after the dependency build with an empty main.
 RUN \
     sed -e 's/^/export /' -e 's/=/="/' -e 's/$/"/' buildinfo.conf > buildinfo.sh && \
     . ./buildinfo.sh && \
