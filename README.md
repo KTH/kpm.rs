@@ -1,9 +1,10 @@
 # kpm
 
-This is attempt to create a (switchable) standalone application to
+This was an attempt to create a (switchable) standalone application to
 provide the KTH Personal Menu.
-It is also a small experiment / demonsteration for doing stuff in Rust
+It was also a small experiment / demonsteration for doing stuff in Rust
 at KTH GVS IT.
+Unfortunatley, it got shut down for political reasons.
 
 ## Development and running
 
